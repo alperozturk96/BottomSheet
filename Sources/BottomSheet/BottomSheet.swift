@@ -115,7 +115,7 @@ extension BottomSheetModifier {
 }
 
 public extension View {
-    func bottomSheet<V: View>(show: Binding<Bool>, useContentRectangle: Bool = true, contentRectangleBackgroundColor: Color = .white, indicatorColor: Color = .gray, backgroundColor: Color = .gray, cornerRadius: CGFloat = 30, height: CGFloat = 300, _ bottomSheetContent: V) -> some View {
+    func bottomSheet<V: View>(show: Binding<Bool>, useContentRectangle: Bool = true, contentRectangleBackgroundColor: Color = .white, indicatorColor: Color = .LightGray, backgroundColor: Color = .LightGray, cornerRadius: CGFloat = 30, height: CGFloat = 300, _ bottomSheetContent: V) -> some View {
         modifier(BottomSheetModifier(show: show, useContentRectangle: useContentRectangle, contentRectangleBackgroundColor: contentRectangleBackgroundColor, indicatorColor: indicatorColor, backgroundColor: backgroundColor, cornerRadius: cornerRadius, height: height, bottomSheetContent: bottomSheetContent))
     }
 }
@@ -132,40 +132,14 @@ struct BottomSheetModifierTestView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                ZStack {
-                    Color.gray
-                    
-                    VStack {
-                        Button {
-                            show.toggle()
-                        } label: {
-                            Text("Open Bottom Sheet")
-                        }
-                    }
+            ZStack {
+                Color.LightGray
+                
+                Button {
+                    show.toggle()
+                } label: {
+                    Text("Open Bottom Sheet")
                 }
-            }
-            .overlay(alignment: .bottom) {
-                HStack {
-                    Group {
-                        Spacer()
-                        Text("Item 1")
-                        Spacer()
-                        Text("Item 2")
-                        Spacer()
-                    }
-                    
-                    Group {
-                        Text("Item 3")
-                        Spacer()
-                        Text("Item 4")
-                        Spacer()
-                        Text("Item 5")
-                        Spacer()
-                    }
-                }
-                .frame(width: UIScreen.width, height: UIScreen.height * 0.1)
-                .background(Color.blue)
             }
             .bottomSheet(show: $show, BottomSheetContent)
         }
@@ -184,17 +158,6 @@ struct BottomSheetModifierTestView: View {
                 .font(.body)
             Text("Bottom Sheet Element 5")
                 .font(.body)
-        }
-    }
-    
-    @ViewBuilder
-    private var BigBottomSheetContent: some View {
-        VStack(alignment: .center) {
-            BottomSheetContent
-            BottomSheetContent
-            BottomSheetContent
-            BottomSheetContent
-            BottomSheetContent
         }
     }
 }
