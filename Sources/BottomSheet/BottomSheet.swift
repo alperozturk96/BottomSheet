@@ -33,6 +33,7 @@ public struct BottomSheetModifier<BottomSheetContent: View>: ViewModifier {
     
     public func body(content: Content) -> some View {
         content
+            .frame(width: show ? UIScreen.width : nil, height: show ? UIScreen.height : nil)
             .overlay {
                 if show {
                     DimmingView() {
