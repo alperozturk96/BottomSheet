@@ -12,19 +12,15 @@ public struct BottomSheetModifier<BottomSheetContent: View>: ViewModifier {
     @State private var offset = CGSize.zero
     
     @Binding var show: Bool
-    var useContentRectangle: Bool
-    var contentRectangleBackgroundColor: Color
     var backgroundColor: Color
     var indicatorColor: Color
     var cornerRadius: CGFloat
-    var height: CGFloat
+    var size: BottomSheetSize
     var bottomSheetContent: BottomSheetContent
     
-    public init(show: Binding<Bool>, useContentRectangle: Bool, contentRectangleBackgroundColor: Color, indicatorColor: Color, backgroundColor: Color, cornerRadius: CGFloat, height: CGFloat, bottomSheetContent: BottomSheetContent) {
+    public init(show: Binding<Bool>, indicatorColor: Color, backgroundColor: Color, cornerRadius: CGFloat, size: BottomSheetSize, bottomSheetContent: BottomSheetContent) {
         self._show = show
-        self.useContentRectangle = useContentRectangle
-        self.contentRectangleBackgroundColor = contentRectangleBackgroundColor
-        self.height = height
+        self.size = size
         self.cornerRadius = cornerRadius
         self.backgroundColor = backgroundColor
         self.indicatorColor = indicatorColor
@@ -33,7 +29,6 @@ public struct BottomSheetModifier<BottomSheetContent: View>: ViewModifier {
     
     public func body(content: Content) -> some View {
         content
-            .frame(width: show ? UIScreen.width : nil, height: show ? UIScreen.height : nil)
             .overlay {
                 if show {
                     DimmingView() {
@@ -59,13 +54,9 @@ extension BottomSheetModifier {
             
             OuterRectangle
             
-            if useContentRectangle {
-                InnerRectangle
-            } else {
-                bottomSheetContent
-            }
+            bottomSheetContent
         }
-        .frame(width: UIScreen.width, height: height)
+        .frame(width: UIScreen.width, height: size.height)
         .offset(y: UIScreen.height * 0.05)
         .offset(offset)
         .gesture(
@@ -100,24 +91,11 @@ extension BottomSheetModifier {
                     .padding(.top, 15)
             }
     }
-    
-    @ViewBuilder
-    private var InnerRectangle: some View {
-        RoundedRectangle(cornerRadius: cornerRadius)
-            .fill(contentRectangleBackgroundColor)
-            .frame(width: UIScreen.width * 0.92, height: height * 0.79)
-            .overlay(ScrollView {
-                VStack(alignment: .center) {
-                    bottomSheetContent
-                        .padding(.vertical, 40)
-                }
-            })
-    }
 }
 
 public extension View {
-    func bottomSheet<V: View>(show: Binding<Bool>, useContentRectangle: Bool = true, contentRectangleBackgroundColor: Color = .white, indicatorColor: Color = .LightGray, backgroundColor: Color = .LightGray, cornerRadius: CGFloat = 30, height: CGFloat = 300, _ bottomSheetContent: V) -> some View {
-        modifier(BottomSheetModifier(show: show, useContentRectangle: useContentRectangle, contentRectangleBackgroundColor: contentRectangleBackgroundColor, indicatorColor: indicatorColor, backgroundColor: backgroundColor, cornerRadius: cornerRadius, height: height, bottomSheetContent: bottomSheetContent))
+    func bottomSheet<V: View>(show: Binding<Bool>, indicatorColor: Color = .Gray, backgroundColor: Color = .LightGray, cornerRadius: CGFloat = 30, size: BottomSheetSize = .medium, _ bottomSheetContent: V) -> some View {
+        modifier(BottomSheetModifier(show: show, indicatorColor: indicatorColor, backgroundColor: backgroundColor, cornerRadius: cornerRadius, size: size, bottomSheetContent: bottomSheetContent))
     }
 }
 
@@ -132,23 +110,61 @@ struct BottomSheetModifierTestView: View {
     @State private var show = false
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.LightGray
-                
-                Button {
-                    show.toggle()
-                } label: {
-                    Text("Open Bottom Sheet")
-                }
+        SmallBottomSheet
+            .previewDisplayName("SmallBottomSheet")
+        
+        MediumBottomSheet
+            .previewDisplayName("MediumBottomSheet")
+        
+        LargeBottomSheet
+            .previewDisplayName("LargeBottomSheet")
+    }
+    
+    @ViewBuilder
+    private var SmallBottomSheet: some View {
+        VStack {
+            Button {
+                show.toggle()
+            } label: {
+                Text("Open Bottom Sheet")
             }
-            .bottomSheet(show: $show, BottomSheetContent)
         }
+        .frame(width: UIScreen.width, height: UIScreen.height)
+        .bottomSheet(show: $show, size: .small, BottomSheetContent)
+    }
+    
+    @ViewBuilder
+    private var MediumBottomSheet: some View {
+        VStack {
+            Button {
+                show.toggle()
+            } label: {
+                Text("Open Bottom Sheet")
+            }
+        }
+        .frame(width: UIScreen.width, height: UIScreen.height)
+        .bottomSheet(show: $show, size: .medium, BottomSheetContent)
+    }
+    
+    @ViewBuilder
+    private var LargeBottomSheet: some View {
+        VStack {
+            Button {
+                show.toggle()
+            } label: {
+                Text("Open Bottom Sheet")
+            }
+        }
+        .frame(width: UIScreen.width, height: UIScreen.height)
+        .bottomSheet(show: $show, size: .large, BottomSheetContent)
     }
     
     @ViewBuilder
     private var BottomSheetContent: some View {
         VStack(alignment: .center) {
+            Spacer()
+                .frame(height: 60)
+            
             Text("Bottom Sheet Element 1")
                 .font(.title)
             Text("Bottom Sheet Element 2")
@@ -159,6 +175,8 @@ struct BottomSheetModifierTestView: View {
                 .font(.body)
             Text("Bottom Sheet Element 5")
                 .font(.body)
+            
+            Spacer()
         }
     }
 }
